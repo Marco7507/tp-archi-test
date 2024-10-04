@@ -14,15 +14,7 @@ export class CreateOrderService {
   ) {}
 
   async execute(createOrderDto: CreateOrderDto): Promise<Order> {
-    const products = [];
-
-    for (const itemDto of createOrderDto.items) {
-      const product = await this.productRepository.findById(itemDto.productId);
-      if (!product) {
-        throw new Error(`Product with id ${itemDto.productId} not found`);
-      }
-      products.push(product);
-    }
+    const products = await this.getProducts(createOrderDto);
 
     const createOrderCommand: CreateOrderCommand = {
       ...createOrderDto,
@@ -35,5 +27,21 @@ export class CreateOrderService {
     const order = new Order(createOrderCommand);
 
     return this.orderRepository.save(order);
+  }
+
+  private async getProducts(
+    createOrderDto: CreateOrderDto,
+  ): Promise<Product[]> {
+    const products = [];
+
+    for (const itemDto of createOrderDto.items) {
+      const product = await this.productRepository.findById(itemDto.productId);
+      if (!product) {
+        throw new Error(`Product with id ${itemDto.productId} not found`);
+      }
+      products.push(product);
+    }
+
+    return products;
   }
 }

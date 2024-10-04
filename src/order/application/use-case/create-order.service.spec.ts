@@ -16,6 +16,7 @@ class ProductRepositoryFake {
       name: 'Product 1',
       price: 100,
       description: 'Description',
+      stock: 10,
     });
     product.id = productId;
     return product;

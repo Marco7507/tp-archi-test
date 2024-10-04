@@ -48,12 +48,18 @@ export class OrderItem {
       );
     }
 
+    if (!itemCommand.product.isActive) {
+      throw new Error('Product is not active');
+    }
+
     this.quantity = itemCommand.quantity;
     this.price = this.calculatePrice(itemCommand);
     this.product = itemCommand.product;
+    this.productName = itemCommand.product.name;
+    this.product.removeQuantity(itemCommand.quantity);
   }
 
-  calculatePrice(itemCommand: ItemDetailCommand): number {
+  private calculatePrice(itemCommand: ItemDetailCommand): number {
     return itemCommand.quantity * itemCommand.product.price;
   }
 }

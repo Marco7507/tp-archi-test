@@ -26,7 +26,7 @@ export class Product {
 
   @Column()
   @Expose({ groups: ['group_products'] })
-  private name: string;
+  name: string;
 
   @Column()
   @Expose({ groups: ['group_products'] })
@@ -42,7 +42,7 @@ export class Product {
 
   @Column()
   @Expose({ groups: ['group_products'] })
-  private isActive: boolean;
+  isActive: boolean;
 
   constructor(createProductDto?: CreateProductDto) {
     if (!createProductDto) {
@@ -86,5 +86,12 @@ export class Product {
     if (updateProductDto.isActive !== undefined) {
       this.isActive = updateProductDto.isActive;
     }
+  }
+
+  removeQuantity(quantity: number) {
+    if (quantity > this.stock) {
+      throw new Error('Not enough stock');
+    }
+    this.stock -= quantity;
   }
 }
