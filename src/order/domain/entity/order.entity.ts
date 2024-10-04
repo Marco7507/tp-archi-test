@@ -1,4 +1,8 @@
-import { ItemDetailCommand, OrderItem } from './order-item.entity';
+import {
+  ItemDetailCommand,
+  ItemDetailDto,
+  OrderItem,
+} from './order-item.entity';
 import {
   Column,
   CreateDateColumn,
@@ -9,6 +13,13 @@ import {
 import { Expose } from 'class-transformer';
 
 import { BadRequestException } from '@nestjs/common';
+
+export interface CreateOrderDto {
+  items: ItemDetailDto[];
+  customerName: string;
+  shippingAddress: string;
+  invoiceAddress: string;
+}
 
 export interface CreateOrderCommand {
   items: ItemDetailCommand[];

@@ -2,6 +2,7 @@ import { CreateOrderService } from './create-order.service';
 import { OrderRepositoryInterface } from '../../domain/port/persistance/order.repository.interface';
 import { Order } from '../../domain/entity/order.entity';
 import { Product } from '../../../product/domain/entity/product.entity';
+import { ProductRepositoryInterface } from '../../../product/domain/port/product.repository.interface';
 
 class OrderRepositoryFake {
   async save(order: Order): Promise<Order> {
@@ -9,31 +10,69 @@ class OrderRepositoryFake {
   }
 }
 
+class ProductRepositoryFake {
+  async findById(productId: number): Promise<Product> {
+    const product = new Product({
+      name: 'Product 1',
+      price: 100,
+      description: 'Description',
+    });
+    product.id = productId;
+    return product;
+  }
+}
+
 const orderRepositoryFake =
-  new OrderRepositoryFake() as OrderRepositoryInterface;
+  new OrderRepositoryFake() as unknown as OrderRepositoryInterface;
+
+const productRepositoryFake =
+  new ProductRepositoryFake() as unknown as ProductRepositoryInterface;
 
 describe("an order can't be created if the order have more than 5 item", () => {
   it('should return an error', async () => {
-    const createOrderService = new CreateOrderService(orderRepositoryFake);
-    const product = new Product({
-      name: 'item 1',
-      price: 10,
-      description: 'description',
-    });
+    const createOrderService = new CreateOrderService(
+      orderRepositoryFake,
+      productRepositoryFake,
+    );
+
     await expect(
       createOrderService.execute({
         customerName: 'John Doe',
         items: [
-          { productName: 'item 1', quantity: 1, product: product },
-          { productName: 'item 1', quantity: 1, product: product },
-          { productName: 'item 1', quantity: 1, product: product },
-          { productName: 'item 1', quantity: 1, product: product },
-          { productName: 'item 1', quantity: 1, product: product },
-          { productName: 'item 1', quantity: 1, product: product },
+          { productId: 1, quantity: 1 },
+          { productId: 2, quantity: 1 },
+          { productId: 3, quantity: 1 },
+          { productId: 4, quantity: 1 },
+          { productId: 5, quantity: 1 },
+          { productId: 6, quantity: 1 },
         ],
         shippingAddress: 'Shipping Address',
         invoiceAddress: 'Invoice Address',
       }),
     ).rejects.toThrow();
+  });
+});
+
+describe('create an order', () => {
+  it('should return an order', async () => {
+    const createOrderService = new CreateOrderService(
+      orderRepositoryFake,
+      productRepositoryFake,
+    );
+
+    const order = await createOrderService.execute({
+      customerName: 'John Doe',
+      items: [
+        { productId: 1, quantity: 1 },
+        { productId: 2, quantity: 1 },
+        { productId: 3, quantity: 1 },
+        { productId: 4, quantity: 1 },
+        { productId: 5, quantity: 1 },
+      ],
+      shippingAddress: 'Shipping Address',
+      invoiceAddress: 'Invoice Address',
+    });
+
+    expect(order).toBeInstanceOf(Order);
   });
 });

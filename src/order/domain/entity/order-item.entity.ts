@@ -2,10 +2,14 @@ import { Order } from './order.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Product } from '../../../product/domain/entity/product.entity';
 
-export interface ItemDetailCommand {
-  productName: string;
+export interface ItemDetailDto {
+  productId: number;
   quantity: number;
+}
+
+export interface ItemDetailCommand {
   product: Product;
+  quantity: number;
 }
 
 @Entity('order-item')
@@ -44,13 +48,12 @@ export class OrderItem {
       );
     }
 
-    this.productName = itemCommand.productName;
     this.quantity = itemCommand.quantity;
+    this.price = this.calculatePrice(itemCommand);
     this.product = itemCommand.product;
-    this.price = this.calculatePrice();
   }
 
-  calculatePrice(): number {
-    return this.quantity * this.product.price;
+  calculatePrice(itemCommand: ItemDetailCommand): number {
+    return itemCommand.quantity * itemCommand.product.price;
   }
 }

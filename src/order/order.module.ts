@@ -13,6 +13,8 @@ import { OrderRepositoryInterface } from 'src/order/domain/port/persistance/orde
 import { GenerateInvoiceService } from 'src/order/application/use-case/generate-invoice.service';
 import { PdfGeneratorServiceInterface } from 'src/order/domain/port/pdf/pdf-generator.service.interface';
 import { PdfGeneratorService } from 'src/order/infrastructure/pdf/pdf-generator.service';
+import { ProductRepositoryInterface } from "../product/domain/port/product.repository.interface";
+import ProductTypeOrmRepository from "../product/infrastructure/persistance/product-type-orm.repository";
 
 @Module({
   imports: [TypeOrmModule.forFeature([Order, OrderItem])],
@@ -72,12 +74,15 @@ import { PdfGeneratorService } from 'src/order/infrastructure/pdf/pdf-generator.
       // quand j'enregistre la classe CreateOrderService
       provide: CreateOrderService,
       // je demande à Nest Js de créer une instance de cette classe
-      useFactory: (orderRepository: OrderRepositoryInterface) => {
-        return new CreateOrderService(orderRepository);
+      useFactory: (
+        orderRepository: OrderRepositoryInterface,
+        productRepository: ProductRepositoryInterface,
+      ) => {
+        return new CreateOrderService(orderRepository, productRepository);
       },
       // en lui injectant une instance de OrderRepositoryTypeOrm
       // à la place de l'interface qui est utilisée dans le constructeur de CreateOrderService
-      inject: [OrderRepositoryTypeOrm],
+      inject: [OrderRepositoryTypeOrm, ProductTypeOrmRepository],
     },
   ],
 })
