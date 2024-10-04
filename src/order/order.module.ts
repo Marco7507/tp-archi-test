@@ -13,8 +13,11 @@ import { OrderRepositoryInterface } from 'src/order/domain/port/persistance/orde
 import { GenerateInvoiceService } from 'src/order/application/use-case/generate-invoice.service';
 import { PdfGeneratorServiceInterface } from 'src/order/domain/port/pdf/pdf-generator.service.interface';
 import { PdfGeneratorService } from 'src/order/infrastructure/pdf/pdf-generator.service';
-import { ProductRepositoryInterface } from "../product/domain/port/product.repository.interface";
-import ProductTypeOrmRepository from "../product/infrastructure/persistance/product-type-orm.repository";
+import { ProductRepositoryInterface } from '../product/domain/port/product.repository.interface';
+import ProductTypeOrmRepository from '../product/infrastructure/persistance/product-type-orm.repository';
+import { AddProductOrderService } from './application/use-case/add-product-order.service';
+import { MailSenderServiceInterface } from './domain/port/mail/mail-sender.service.interface';
+import { MailSenderCustomService } from './infrastructure/mail/mail-sender-custom.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Order, OrderItem])],
@@ -77,13 +80,23 @@ import ProductTypeOrmRepository from "../product/infrastructure/persistance/prod
       useFactory: (
         orderRepository: OrderRepositoryInterface,
         productRepository: ProductRepositoryInterface,
+        mailSenderService: MailSenderServiceInterface,
       ) => {
-        return new CreateOrderService(orderRepository, productRepository);
+        return new CreateOrderService(
+          orderRepository,
+          productRepository,
+          mailSenderService,
+        );
       },
       // en lui injectant une instance de OrderRepositoryTypeOrm
       // à la place de l'interface qui est utilisée dans le constructeur de CreateOrderService
-      inject: [OrderRepositoryTypeOrm, ProductTypeOrmRepository],
+      inject: [
+        OrderRepositoryTypeOrm,
+        ProductTypeOrmRepository,
+        MailSenderCustomService,
+      ],
     },
+    AddProductOrderService,
   ],
 })
 export class OrderModule {}
