@@ -255,4 +255,10 @@ export class Order {
     this.orderItems.push(orderItem);
     this.price += orderItem.price;
   }
+
+  checkIfOrderCanBeModified() {
+    if (this.status !== OrderStatus.PENDING) {
+      throw new Error('Order cannot be modified');
+    }
+  }
 }

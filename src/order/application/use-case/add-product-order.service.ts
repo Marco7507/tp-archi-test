@@ -27,6 +27,8 @@ export class AddProductOrderService {
       throw new Error(`Order with id ${orderId} not found`);
     }
 
+    order.checkIfOrderCanBeModified();
+
     const orderItem = new OrderItem(
       { product, quantity },
       this.mailSenderService,
