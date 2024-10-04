@@ -13,6 +13,7 @@ import {
 import { Expose } from 'class-transformer';
 
 import { BadRequestException } from '@nestjs/common';
+import { MailSenderServiceInterface } from '../port/mail/mail-sender.service.interface';
 
 export interface CreateOrderDto {
   items: ItemDetailDto[];
@@ -116,8 +117,11 @@ export class Order {
   //   return this;
   // }
 
-  public constructor(createOrderCommand?: CreateOrderCommand) {
-    if (!createOrderCommand) {
+  public constructor(
+    createOrderCommand?: CreateOrderCommand,
+    mailSenderService?: MailSenderServiceInterface,
+  ) {
+    if (!createOrderCommand || !mailSenderService) {
       return;
     }
 
@@ -125,7 +129,7 @@ export class Order {
     this.verifyMaxItemIsValid(createOrderCommand);
 
     this.orderItems = createOrderCommand.items.map(
-      (item) => new OrderItem(item),
+      (item) => new OrderItem(item, mailSenderService),
     );
 
     this.customerName = createOrderCommand.customerName;
@@ -241,5 +245,14 @@ export class Order {
       .map((item) => item.productName)
       .join(', ');
     return `invoice number ${this.id}, with items: ${itemsNames}`;
+  }
+
+  addProduct(orderItem: OrderItem) {
+    if (this.orderItems.length >= Order.MAX_ITEMS) {
+      throw new Error('Cannot add more than 5 items');
+    }
+
+    this.orderItems.push(orderItem);
+    this.price += orderItem.price;
   }
 }

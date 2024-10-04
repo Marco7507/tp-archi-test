@@ -3,6 +3,7 @@ import { OrderRepositoryInterface } from '../../domain/port/persistance/order.re
 import { Order } from '../../domain/entity/order.entity';
 import { Product } from '../../../product/domain/entity/product.entity';
 import { ProductRepositoryInterface } from '../../../product/domain/port/product.repository.interface';
+import { MailSenderServiceInterface } from '../../domain/port/mail/mail-sender.service.interface';
 
 class OrderRepositoryFake {
   async save(order: Order): Promise<Order> {
@@ -23,17 +24,27 @@ class ProductRepositoryFake {
   }
 }
 
+class MailSenderServiceFake {
+  async sendMail(): Promise<void> {
+    return;
+  }
+}
+
 const orderRepositoryFake =
   new OrderRepositoryFake() as unknown as OrderRepositoryInterface;
 
 const productRepositoryFake =
   new ProductRepositoryFake() as unknown as ProductRepositoryInterface;
 
+const mailSenderServiceFake =
+  new MailSenderServiceFake() as unknown as MailSenderServiceInterface;
+
 describe("an order can't be created if the order have more than 5 item", () => {
   it('should return an error', async () => {
     const createOrderService = new CreateOrderService(
       orderRepositoryFake,
       productRepositoryFake,
+      mailSenderServiceFake,
     );
 
     await expect(
@@ -59,6 +70,7 @@ describe('create an order', () => {
     const createOrderService = new CreateOrderService(
       orderRepositoryFake,
       productRepositoryFake,
+      mailSenderServiceFake,
     );
 
     const order = await createOrderService.execute({

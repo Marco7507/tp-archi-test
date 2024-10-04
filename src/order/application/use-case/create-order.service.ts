@@ -6,11 +6,13 @@ import {
 import { OrderRepositoryInterface } from '../../domain/port/persistance/order.repository.interface';
 import { ProductRepositoryInterface } from '../../../product/domain/port/product.repository.interface';
 import { Product } from '../../../product/domain/entity/product.entity';
+import { MailSenderServiceInterface } from '../../domain/port/mail/mail-sender.service.interface';
 
 export class CreateOrderService {
   constructor(
     private readonly orderRepository: OrderRepositoryInterface,
     private readonly productRepository: ProductRepositoryInterface,
+    private readonly mailSenderService: MailSenderServiceInterface,
   ) {}
 
   async execute(createOrderDto: CreateOrderDto): Promise<Order> {
@@ -24,7 +26,7 @@ export class CreateOrderService {
       })),
     };
 
-    const order = new Order(createOrderCommand);
+    const order = new Order(createOrderCommand, this.mailSenderService);
 
     return this.orderRepository.save(order);
   }

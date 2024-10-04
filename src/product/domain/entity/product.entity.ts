@@ -1,5 +1,6 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Expose } from 'class-transformer';
+import { MailSenderServiceInterface } from '../../../order/domain/port/mail/mail-sender.service.interface';
 
 export interface CreateProductDto {
   name: string;
@@ -88,10 +89,21 @@ export class Product {
     }
   }
 
-  removeQuantity(quantity: number) {
+  removeQuantity(
+    quantity: number,
+    mailSenderService: MailSenderServiceInterface,
+  ) {
     if (quantity > this.stock) {
       throw new Error('Not enough stock');
     }
+
     this.stock -= quantity;
+
+    if (this.stock !== 0) {
+      return;
+    }
+
+    this.isActive = false;
+    mailSenderService.sendMail('admin@test.fr', 'Stock empty', 'Stock empty');
   }
 }
