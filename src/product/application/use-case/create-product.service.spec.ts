@@ -1,4 +1,4 @@
-import { Product } from 'aws-sdk/clients/ssm';
+import { Product } from '../../domain/entity/product.entity';
 import { ProductRepositoryInterface } from '../../domain/port/product.repository.interface';
 import { CreateProductService } from './create-product.service';
 

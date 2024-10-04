@@ -61,7 +61,11 @@ export class Product {
     this.price = createProductDto.price;
     this.description = createProductDto.description;
     this.stock = createProductDto.stock || 0;
-    this.isActive = createProductDto.isActive || true;
+    if (createProductDto.isActive !== undefined) {
+      this.isActive = createProductDto.isActive;
+    } else {
+      this.isActive = true;
+    }
   }
 
   updateProduct(updateProductDto: UpdateProductDto) {

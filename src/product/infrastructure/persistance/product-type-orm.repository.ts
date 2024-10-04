@@ -32,4 +32,12 @@ export default class ProductTypeOrmRepository
 
     await queryBuilder.delete().execute();
   }
+
+  findByActive(isActive: boolean): Promise<Product[]> {
+    const queryBuilder = this.createQueryBuilder('product');
+
+    queryBuilder.where('product.isActive = :isActive', { isActive });
+
+    return queryBuilder.getMany();
+  }
 }

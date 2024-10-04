@@ -8,4 +8,6 @@ export interface ProductRepositoryInterface {
   findAll(): Promise<Product[]>;
 
   deleteProduct(id: number): Promise<void>;
+
+  findByActive(isActive: boolean): Promise<Product[]>;
 }
