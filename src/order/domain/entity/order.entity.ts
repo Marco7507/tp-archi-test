@@ -1,4 +1,4 @@
-import { ItemDetailCommand, OrderItem } from '../entity/order-item.entity';
+import { ItemDetailCommand, OrderItem } from './order-item.entity';
 import {
   Column,
   CreateDateColumn,
@@ -121,7 +121,7 @@ export class Order {
     this.shippingAddress = createOrderCommand.shippingAddress;
     this.invoiceAddress = createOrderCommand.invoiceAddress;
     this.status = OrderStatus.PENDING;
-    this.price = this.calculateOrderAmount(createOrderCommand.items);
+    this.price = this.calculateOrderAmount();
   }
 
   private verifyMaxItemIsValid(createOrderCommand: CreateOrderCommand) {
@@ -144,8 +144,11 @@ export class Order {
     }
   }
 
-  private calculateOrderAmount(items: ItemDetailCommand[]): number {
-    const totalAmount = items.reduce((sum, item) => sum + item.price, 0);
+  private calculateOrderAmount(): number {
+    const totalAmount = this.orderItems.reduce(
+      (sum, item) => sum + item.product.price,
+      0,
+    );
 
     if (totalAmount < Order.AMOUNT_MINIMUM) {
       throw new BadRequestException(

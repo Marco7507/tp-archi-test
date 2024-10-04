@@ -13,7 +13,7 @@ export interface CreateProductDto {
 export class Product {
   @PrimaryGeneratedColumn()
   @Expose({ groups: ['group_products'] })
-  private id: number;
+  id: number;
 
   @Column()
   @Expose({ groups: ['group_products'] })
@@ -21,7 +21,7 @@ export class Product {
 
   @Column()
   @Expose({ groups: ['group_products'] })
-  private price: number;
+  price: number;
 
   @Column()
   @Expose({ groups: ['group_products'] })
