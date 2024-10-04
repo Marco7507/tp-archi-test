@@ -34,4 +34,24 @@ export class Product {
   @Column()
   @Expose({ groups: ['group_products'] })
   private isActive: boolean;
+
+  constructor(createProductDto?: CreateProductDto) {
+    if (!createProductDto) {
+      return;
+    }
+
+    if (
+      !createProductDto.name ||
+      !createProductDto.price ||
+      !createProductDto.description
+    ) {
+      throw new Error('Invalid product');
+    }
+
+    this.name = createProductDto.name;
+    this.price = createProductDto.price;
+    this.description = createProductDto.description;
+    this.stock = createProductDto.stock || 0;
+    this.isActive = createProductDto.isActive || true;
+  }
 }
