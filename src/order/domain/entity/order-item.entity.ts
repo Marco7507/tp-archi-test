@@ -40,9 +40,12 @@ export class OrderItem {
   product: Product;
 
   constructor(
-    itemCommand: ItemDetailCommand,
-    mailSenderService: MailSenderServiceInterface,
+    itemCommand?: ItemDetailCommand,
+    mailSenderService?: MailSenderServiceInterface,
   ) {
+    if (!itemCommand || !itemCommand.product) {
+      return;
+    }
     if (itemCommand.quantity > OrderItem.MAX_QUANTITY) {
       throw new Error(
         'Quantity of items cannot exceed ' + OrderItem.MAX_QUANTITY,
