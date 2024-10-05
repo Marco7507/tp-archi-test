@@ -18,6 +18,8 @@ import ProductTypeOrmRepository from '../product/infrastructure/persistance/prod
 import { AddProductOrderService } from './application/use-case/add-product-order.service';
 import { MailSenderServiceInterface } from './domain/port/mail/mail-sender.service.interface';
 import { MailSenderCustomService } from './infrastructure/mail/mail-sender-custom.service';
+import PromotionRepositoryInterface from '../promotion/domain/port/promotion.repository.interface';
+import PromotionTypeOrmRepository from '../promotion/infrastructure/persistance/promotion-type-orm.repository';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Order, OrderItem])],
@@ -26,6 +28,9 @@ import { MailSenderCustomService } from './infrastructure/mail/mail-sender-custo
   providers: [
     OrderRepositoryTypeOrm,
     PdfGeneratorService,
+    ProductTypeOrmRepository,
+    PromotionTypeOrmRepository,
+    MailSenderCustomService,
 
     {
       provide: GenerateInvoiceService,
@@ -81,11 +86,13 @@ import { MailSenderCustomService } from './infrastructure/mail/mail-sender-custo
         orderRepository: OrderRepositoryInterface,
         productRepository: ProductRepositoryInterface,
         mailSenderService: MailSenderServiceInterface,
+        promotionRepository: PromotionRepositoryInterface,
       ) => {
         return new CreateOrderService(
           orderRepository,
           productRepository,
           mailSenderService,
+          promotionRepository,
         );
       },
       // en lui injectant une instance de OrderRepositoryTypeOrm
@@ -94,6 +101,7 @@ import { MailSenderCustomService } from './infrastructure/mail/mail-sender-custo
         OrderRepositoryTypeOrm,
         ProductTypeOrmRepository,
         MailSenderCustomService,
+        PromotionTypeOrmRepository,
       ],
     },
     AddProductOrderService,

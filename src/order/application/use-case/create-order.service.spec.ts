@@ -4,6 +4,7 @@ import { Order } from '../../domain/entity/order.entity';
 import { Product } from '../../../product/domain/entity/product.entity';
 import { ProductRepositoryInterface } from '../../../product/domain/port/product.repository.interface';
 import { MailSenderServiceInterface } from '../../domain/port/mail/mail-sender.service.interface';
+import PromotionRepositoryInterface from '../../../promotion/domain/port/promotion.repository.interface';
 
 class OrderRepositoryFake {
   async save(order: Order): Promise<Order> {
@@ -30,6 +31,19 @@ class MailSenderServiceFake {
   }
 }
 
+class PromotionRepositoryFake {
+  async findByCode(promotionCode: string): Promise<any> {
+    if (promotionCode === '#PROMO') {
+      return {
+        name: 'promotion 1',
+        code: '#PROMO',
+        amount: 10,
+      };
+    }
+    return null;
+  }
+}
+
 const orderRepositoryFake =
   new OrderRepositoryFake() as unknown as OrderRepositoryInterface;
 
@@ -39,12 +53,16 @@ const productRepositoryFake =
 const mailSenderServiceFake =
   new MailSenderServiceFake() as unknown as MailSenderServiceInterface;
 
+const promotionRepositoryFake =
+  new PromotionRepositoryFake() as unknown as PromotionRepositoryInterface;
+
 describe("an order can't be created if the order have more than 5 item", () => {
   it('should return an error', async () => {
     const createOrderService = new CreateOrderService(
       orderRepositoryFake,
       productRepositoryFake,
       mailSenderServiceFake,
+      promotionRepositoryFake,
     );
 
     await expect(
@@ -71,6 +89,7 @@ describe('create an order', () => {
       orderRepositoryFake,
       productRepositoryFake,
       mailSenderServiceFake,
+      promotionRepositoryFake,
     );
 
     const order = await createOrderService.execute({

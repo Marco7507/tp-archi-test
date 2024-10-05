@@ -32,4 +32,12 @@ export default class PromotionTypeOrmRepository
 
     return queryBuilder.getOne();
   }
+
+  findByCode(promotionCode: string): Promise<any> {
+    const queryBuilder = this.createQueryBuilder('promotion');
+
+    queryBuilder.where('promotion.code = :code', { code: promotionCode });
+
+    return queryBuilder.getOne();
+  }
 }

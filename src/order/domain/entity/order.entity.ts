@@ -7,6 +7,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
@@ -14,12 +15,14 @@ import { Expose } from 'class-transformer';
 
 import { BadRequestException } from '@nestjs/common';
 import { MailSenderServiceInterface } from '../port/mail/mail-sender.service.interface';
+import { Promotion } from '../../../promotion/domain/entity/promotion.entity';
 
 export interface CreateOrderDto {
   items: ItemDetailDto[];
   customerName: string;
   shippingAddress: string;
   invoiceAddress: string;
+  promotionCode?: string;
 }
 
 export interface CreateOrderCommand {
@@ -27,6 +30,7 @@ export interface CreateOrderCommand {
   customerName: string;
   shippingAddress: string;
   invoiceAddress: string;
+  promotion: Promotion | null;
 }
 
 export enum OrderStatus {
@@ -69,6 +73,10 @@ export class Order {
   })
   @Expose({ groups: ['group_orders'] })
   orderItems: OrderItem[];
+
+  @ManyToOne(() => Promotion, { nullable: true })
+  @Expose({ groups: ['group_orders'] })
+  promotion: Promotion;
 
   @Column({ nullable: true })
   @Expose({ groups: ['group_orders'] })
@@ -137,6 +145,10 @@ export class Order {
     this.invoiceAddress = createOrderCommand.invoiceAddress;
     this.status = OrderStatus.PENDING;
     this.price = this.calculateOrderAmount();
+
+    if (createOrderCommand.promotion) {
+      this.applyPromotion(createOrderCommand.promotion);
+    }
   }
 
   private verifyMaxItemIsValid(createOrderCommand: CreateOrderCommand) {
@@ -172,6 +184,15 @@ export class Order {
     }
 
     return totalAmount;
+  }
+
+  applyPromotion(promotionToApply: Promotion) {
+    if (this.promotion) {
+      throw new BadRequestException('Cannot apply more than one promotion');
+    }
+
+    this.price -= promotionToApply.amount;
+    this.promotion = promotionToApply;
   }
 
   pay(): void {
