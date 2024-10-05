@@ -1,5 +1,7 @@
 import { ProductRepositoryInterface } from '../../domain/port/product.repository.interface';
 import { OrderRepositoryInterface } from '../../../order/domain/port/persistance/order.repository.interface';
+import { BadRequestException } from '@nestjs/common';
+import { Product } from '../../domain/entity/product.entity';
 
 export class DeleteProductService {
   constructor(
@@ -7,17 +9,17 @@ export class DeleteProductService {
     private readonly orderRepository: OrderRepositoryInterface,
   ) {}
 
-  async execute(id: number): Promise<any> {
+  async execute(id: number): Promise<Product> {
     const product = await this.productRepository.findById(id);
 
     if (!product) {
-      throw new Error('Product not found');
+      throw new BadRequestException('Product not found');
     }
 
     const orders = await this.orderRepository.findByProductId(id.toString());
 
     if (orders.length > 0) {
-      throw new Error('Product is used in orders');
+      throw new BadRequestException('Product is used in orders');
     }
 
     await this.productRepository.deleteProduct(id);

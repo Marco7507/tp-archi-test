@@ -1,5 +1,6 @@
 import { ProductRepositoryInterface } from '../../domain/port/product.repository.interface';
 import { UpdateProductDto } from '../../domain/entity/product.entity';
+import { BadRequestException } from '@nestjs/common';
 
 export class UpdateProductService {
   constructor(private readonly productRepository: ProductRepositoryInterface) {}
@@ -8,7 +9,7 @@ export class UpdateProductService {
     const product = await this.productRepository.findById(updateProductDto.id);
 
     if (!product) {
-      throw new Error('Product not found');
+      throw new BadRequestException('Product not found');
     }
 
     product.updateProduct(updateProductDto);
